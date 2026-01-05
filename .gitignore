@@ -1,0 +1,14 @@
+__pycache__/
+.ipynb_checkpoints/
+*.pt
+*.pth
+*.ckpt
+*.npz
+*.npy
+*.pkl
+*.csv
+*.zip
+*.tar
+*.tar.gz
+*.log
+.DS_Store

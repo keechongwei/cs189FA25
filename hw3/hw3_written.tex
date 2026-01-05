@@ -1,0 +1,233 @@
+\documentclass[11pt]{article}
+\usepackage[utf8]{inputenc}
+\usepackage{textgreek}
+
+% ---------- Color helpers (used in Adam/AdamW block) ----------
+\usepackage{xcolor}
+\definecolor{regpink}{HTML}{E39CC2}   % L2 in-gradient highlight
+\definecolor{adamwgreen}{HTML}{CDE26D} % AdamW decoupled highlight
+\newcommand{\mathcolorbox}[2]{%
+  \begingroup\setlength{\fboxsep}{1pt}\colorbox{#1}{$\displaystyle #2$}\endgroup}
+
+% ---------- Graphics & diagrams ----------
+\usepackage{tikz}
+\usetikzlibrary{arrows.meta}
+
+% ---------- Packages ----------
+\usepackage{hyperref}
+\usepackage{amsmath,amssymb,amsfonts,amsthm}
+\usepackage{enumitem}
+\usepackage{geometry}
+\usepackage{fancyhdr}
+\usepackage{algorithm}
+\usepackage{algpseudocode}
+
+% ---------- Page Geometry ----------
+\geometry{margin=1in}
+
+% ---------- Running Header / Footer ----------
+\pagestyle{fancy}
+\fancyhf{}
+\lhead{\textbf{CS 189/289A}}
+\rhead{Fall 2025}
+\cfoot{\thepage}
+
+% ---------- Helpful Macros ----------
+\newcommand{\RR}{\mathbb{R}}
+\newcommand{\EE}{\mathbb{E}}
+\newcommand{\PP}{\mathbb{P}}
+\renewcommand{\vec}[1]{\mathbf{#1}}
+
+% ============================================================
+\begin{document}
+
+% ---------- Homework Header ---------
+\begin{center}
+    {\huge\bfseries Backpropagation and Optimizers}\\[6pt]
+    \textbf{Due: Friday, November 7th at 11:59 pm}\\
+\end{center}
+
+\vspace{0.5em}\hrule\vspace{1em}
+
+% ---------- Deliverables ----------
+\noindent\textbf{Deliverables.} Submit a PDF of your write-up to Gradescope \emph{HW3 Written} \\
+\noindent \textit{Note}: we \textbf{highly discourage} very long answers, your free response answers should be 1-3 sentences.
+
+\section*{Honor Code}
+
+\noindent\emph{Write and sign the following statement:}
+
+\begin{quote}\small
+“I certify that all solutions in this document are entirely my own and that I have
+not looked at anyone else’s solution. I have given credit to all external
+sources I consulted.”
+\end{quote}
+
+\newpage
+
+% ---------- Questions ----------
+\section*{Backpropagation Practice}
+Let's practice calculating the gradient using adjoints. We're given the following function and want to find the gradient of the function with respect $\textbf{x} = [x_1 \ \ x_2 \ \ x_3]$:
+\[
+f(\textbf{x}) = \frac{x_1}{x_2}e^{x_2 + x_3} - x_2^2
+\]
+
+\begin{enumerate}[label=\textbf{Q\arabic*.}, leftmargin=2.2em]
+
+\item \textbf{Constructing the Computation Graph} Draw the computation graph (check out lecture 12 for reference). We recommend handwriting it instead of using \LaTeX.
+\vspace*{10\baselineskip}
+
+\item \textbf{Computing Adjoints}
+Now, compute the adjoint for each node in your computation graph with respect to $\textbf{x} = [x_1 \ \ x_2 \ \ x_3] = [1 \ \ 2 \ \ 3]$. What is the gradient with respect to $\textbf{x}$? We recommend that you use your computation graph and write it out instead of typing.
+\vspace*{14\baselineskip}
+
+\end{enumerate}
+
+\newpage
+% ---------- Overview ----------
+\section*{Optimizers Overview}
+Adaptive gradient methods are among the most widely used optimization algorithms in deep learning. In this assignment, we focus on two main algorithms: \textbf{Adam} and \textbf{AdamW} (briefly AdaGrad, RMSProp). Because the primary sources are dense, please start with the short blog posts below, then (optionally) consult the original papers.
+
+\paragraph*{Recommended reading (short):}
+\begin{itemize}[leftmargin=1.4em]
+    \item \href{https://towardsdatascience.com/understanding-deep-learning-optimizers-momentum-adagrad-rmsprop-adam-e311e377e9c2/}{Understanding Deep Learning Optimizers: Momentum, AdaGrad, RMSProp, Adam} — quick refresher on the progression from SGD to Adam.
+  \item \href{https://adelbennaceur.github.io/posts/adam_vs_adamw/}{Adam vs.\ AdamW (A. Bennaceur)} — concise comparison highlighting why decoupled weight decay matters.
+  \item \textbf{Supplement (Section 3):} \href{https://cs182sp21.github.io/static/discussions/dis2-sol.pdf}{CS182 Discussion 2 Solutions (Spring 2021)} — see Section~3 for a compact optimizer summary.
+\end{itemize}
+
+\paragraph*{Optional primary sources:}
+\begin{itemize}[leftmargin=1.4em]
+  \item \href{https://arxiv.org/abs/1412.6980}{Adam: A Method for Stochastic Optimization (Kingma \& Ba, 2015)}
+  \item \href{https://arxiv.org/abs/1711.05101}{Decoupled Weight Decay Regularization (Loshchilov \& Hutter, 2017)}
+\end{itemize}
+
+Before answering the questions, also briefly review the original Adam algorithm (Algorithm 1 from Kingma \& Ba, 2014) and AdamW, reproduced below for reference.
+
+% ---------- Adam Algorithm Block ----------
+\begin{algorithm}[H]
+\caption{Adam, our proposed algorithm for stochastic optimization (Kingma \& Ba, 2014)}
+\begin{algorithmic}[1]
+\Require $\alpha$: Stepsize
+\Require $\beta_1, \beta_2 \in [0,1)$: Exponential decay rates for the moment estimates
+\Require $f(\theta)$: Stochastic objective function with parameters $\theta$
+\Require $\theta_0$: Initial parameter vector
+\State $m_0 \gets 0$ \Comment{Initialize 1st moment vector}
+\State $v_0 \gets 0$ \Comment{Initialize 2nd moment vector}
+\State $t \gets 0$ \Comment{Initialize timestep}
+\While{$\theta_t$ not converged}
+    \State $t \gets t + 1$
+    \State $g_t \gets \nabla_\theta f_t(\theta_{t-1})$ \Comment{Get gradients}
+    \State $m_t \gets \beta_1 \cdot m_{t-1} + (1 - \beta_1) \cdot g_t$ \Comment{EMA of gradients}
+    \State $v_t \gets \beta_2 \cdot v_{t-1} + (1 - \beta_2) \cdot g_t^2$ \Comment{EMA of squared gradients}
+    \State $\hat{m}_t \gets m_t / (1 - \beta_1^t)$ \Comment{Bias-corrected 1st moment}
+    \State $\hat{v}_t \gets v_t / (1 - \beta_2^t)$ \Comment{Bias-corrected 2nd moment}
+    \State $\theta_t \gets \theta_{t-1} - \alpha \cdot \hat{m}_t / (\sqrt{\hat{v}_t} + \epsilon)$ \Comment{Update}
+\EndWhile
+\State \textbf{return} $\theta_t$
+\end{algorithmic}
+\end{algorithm}
+
+\begin{algorithm}[H]
+\caption{\colorbox{regpink}{Adam with L2 regularization}\; and \;
+\colorbox{adamwgreen}{Adam with decoupled weight decay (AdamW)}}
+\begin{algorithmic}[1]
+\Require $\alpha = 0.001$, $\beta_1 = 0.9$, $\beta_2 = 0.999$, $\epsilon = 10^{-8}$, $\lambda \in \mathbb{R}$
+\State \textbf{initialize} $t \gets 0$, parameter vector $\theta_{t=0} \in \mathbb{R}^n$, first moment $m_{t=0} \gets 0$, second moment $v_{t=0} \gets 0$, schedule multiplier $\eta_{t=0} \in \mathbb{R}$
+\Repeat
+  \State $t \gets t + 1$
+  \State $\nabla f_t(\theta_{t-1}) \gets \textsc{SelectBatch}(\theta_{t-1})$
+  \State $g_t \gets \nabla f_t(\theta_{t-1})\; \mathcolorbox{regpink}{+\lambda\,\theta_{t-1}}$ \Comment{(L2‐regularized Adam) add penalty inside gradient}
+  \State $m_t \gets \beta_1 m_{t-1} + (1-\beta_1)\,g_t$
+  \State $v_t \gets \beta_2 v_{t-1} + (1-\beta_2)\,g_t^{2}$
+  \State $\hat m_t \gets m_t/(1-\beta_1^{t})$
+  \State $\hat v_t \gets v_t/(1-\beta_2^{t})$
+  \State $\eta_t \gets \textsc{SetScheduleMultiplier}(t)$
+  \State $\theta_t \gets \theta_{t-1} - \eta_t\!\left(\alpha\,\frac{\hat m_t}{\sqrt{\hat v_t}+\epsilon}\; \mathcolorbox{adamwgreen}{+\lambda\,\theta_{t-1}}\right)$ \Comment{(AdamW) decoupled decay}
+\Until{stopping criterion is met}
+\State \textbf{return} optimized parameters $\theta_t$
+\end{algorithmic}
+\end{algorithm}
+
+\newpage
+% ---------- Questions ----------
+
+\begin{enumerate}[label=\textbf{Q\arabic*.}, leftmargin=2.2em, resume]
+
+  \item \textbf{Reviewing Previous Optimizers.}  
+   We have learned how variants of gradient descent improve training speed and stability.  
+  For each method --- \textbf{Momentum}, \textbf{AdaGrad}, and \textbf{RMSProp} --- write the update equations, state the key idea (one concise sentence), and describe the problem it solves (one concise sentence).  
+  We have provided SGD for you.
+
+  \textbf{SGD} \\
+\emph{Update:} $\theta_t \gets \theta_{t-1} - \alpha\, g_t$, where $g_t = \nabla_\theta f_t(\theta_{t-1})$. \\
+\emph{Key idea:} Use a random minibatch each step for computational efficiency. \\
+\emph{Problem it solves:} Full-batch gradient descent is slow and redundant; minibatching makes updates cheaper.
+\vspace*{14\baselineskip}
+
+  \item \textbf{Handling Large Gradients.} What happens when gradients are very large in plain gradient descent, and how does Adam’s update rule address this issue?
+  \vspace*{5\baselineskip}
+
+  \item \textbf{Introducing AdamW.} How does AdamW decouple weight decay from the gradient update? Why does this help generalization?
+  \vspace*{5\baselineskip}
+
+  \item \textbf{AdamW Weight Decoupling.} How does decoupling weight decay affect hyperparameter sensitivity?
+  \vspace*{6\baselineskip}
+
+  \item \textbf{Tracing Adam’s Origins (Line Mapping).}   
+    As seen in lecture, Adam builds on ideas from several earlier optimizers. Now let's explore exactly how these ideas are used in Adam. Below are the key lines (7–11) from the Adam algorithm.  
+    
+    For each line, label which previous algorithm inspired it (or indicate if it was newly introduced) using one of the following categories:
+    \begin{itemize}
+        \item Momentum
+        \item Adaptive Scaling (RMSProp/AdaGrad)
+        \item Newly Introduced by Adam
+        \item Combination (merges two or more earlier ideas into a single update rule)
+    \end{itemize}
+
+    Briefly explain your reasoning for each label.
+
+    \begin{algorithm}[H]
+    \caption{Adam: Core Update Lines (Kingma \& Ba, 2014)}
+    \begin{algorithmic}[1]
+        \State $m_t \gets \beta_1 m_{t-1} + (1 - \beta_1) g_t$ \Comment{Line 7}
+        \State $v_t \gets \beta_2 v_{t-1} + (1 - \beta_2) g_t^2$ \Comment{Line 8}
+        \State $\hat{m}_t \gets m_t / (1 - \beta_1^t)$ \Comment{Line 9}
+        \State $\hat{v}_t \gets v_t / (1 - \beta_2^t)$ \Comment{Line 10}
+        \State $\theta_t \gets \theta_{t-1} - \alpha \cdot \hat{m}_t / (\sqrt{\hat{v}_t} + \epsilon)$ \Comment{Line 11}
+    \end{algorithmic}
+    \end{algorithm}
+    \vspace*{12\baselineskip}
+
+\item \textbf{Step 1 Gradient: Adam and AdamW updates.}
+Consider the scalar objective
+\[
+f(\theta) = \theta^2, \qquad \nabla_\theta f(\theta) = g_t = 2\theta_t.
+\]
+Use the following hyperparameters unless otherwise specified:
+\[
+\theta_0 = 10,\quad \alpha = 0.1,\quad \lambda = 0.01,\quad 
+\beta_1 = 0.9,\quad \beta_2 = 0.99,\quad \epsilon = 10^{-8},\quad 
+m_0 = v_0 = 0.
+\]
+Compute all quantities for $t=1$.
+\begin{enumerate}[label=(\alph*)]
+  \item Compute $g_1, m_1, v_1$.
+  \item Compute bias-corrected $\hat m_1, \hat v_1$ (feel free to refer to Algorithm Block provided in Q1).
+  \item Compute $\theta_1^{\text{Adam}} = 
+        \theta_0 - \alpha \frac{\hat m_1}{\sqrt{\hat v_1} + \epsilon}$ (step 1 update of Adam).
+  \item Compute $\theta_1^{\text{AdamW}} =
+        \theta_1^{\text{Adam}} - \alpha \lambda \theta_0$ (step 1 update of AdamW).
+\end{enumerate}
+
+\item \textbf{Step 2 Gradient: Adam continuation ($\beta_2 = 0.99$).}
+Compute the second update step for Adam (you don't have to compute for AdamW). In other words, compute $\theta_2^{\text{Adam}}$.
+\vspace*{8\baselineskip}
+
+\item \textbf{Conceptual reflection.}
+Keep the baseline at $\beta_2 = 0.99$. Now imagine we set $\beta_2 = 0.5$ (all else unchanged).
+Without redoing the full calculation, explain qualitatively what changes at $t=1$ and $t\ge2$,
+and how this would affect stability vs.\ responsiveness.\\[0.5\baselineskip]
+
+\end{enumerate}
+
+\end{document}

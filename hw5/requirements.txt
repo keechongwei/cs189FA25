@@ -1,0 +1,7 @@
+transformers==4.57.2
+accelerate
+datasets
+trl
+bitsandbytes
+pandas
+torch

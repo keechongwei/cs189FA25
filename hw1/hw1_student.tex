@@ -1,0 +1,340 @@
+\documentclass[11pt]{article}
+\usepackage{hyperref}
+
+% ---------- Packages ----------
+\usepackage{amsmath,amssymb,amsfonts,amsthm}
+\usepackage{enumitem}
+\usepackage{geometry}
+\usepackage{fancyhdr}
+\usepackage{hyperref}
+\usepackage{xcolor}   
+\usepackage{amsmath} 
+\usepackage{amssymb}
+\usepackage{amsfonts}
+\usepackage{tikz}
+\usepackage{xcolor}
+\usepackage{environ} 
+
+% ---------- Page Geometry ----------
+\geometry{margin=1in}
+
+% ---------- Running Header / Footer ----------
+\pagestyle{fancy}
+\fancyhf{}
+\lhead{\textbf{CS 189/289A}}
+\rhead{Fall 2025}
+\cfoot{\thepage}
+
+% ---------- Helpful Macros ----------
+\newcommand{\RR}{\mathbb{R}}
+\newcommand{\EE}{\mathbb{E}}
+\newcommand{\PP}{\mathbb{P}}
+\renewcommand{\vec}[1]{\mathbf{#1}}
+
+\begin{document}
+
+% ---------- Title Block ----------
+\begin{center}
+    {\huge\bfseries Homework 1}\\[4pt]
+    \textbf{Due : Friday, September 19 at 11 : 59 pm}\\
+\end{center}
+
+\vspace{0.5em}\hrule\vspace{1em}
+
+% ---------- Deliverables ----------
+\noindent\textbf{Deliverables.} Submit a single PDF of your write-up to Gradescope \emph{HW1 Write-Up}. 
+\\
+\\
+\noindent\textbf{Start each problem on a new page.}
+
+
+\vspace{0.5em}\hrule\vspace{0.75em}
+
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\section*{Honor Code}
+
+\noindent\emph{Write and sign the following statement:}
+
+\begin{quote}\small
+“I certify that all solutions in this document are entirely my own and that I have
+not looked at anyone else’s solution. I have given credit to all external
+sources I consulted.”
+\end{quote}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\section*{Linear Algebra}
+
+\begin{enumerate}[label=\arabic*., resume]
+
+    \item \textbf{System of equations (3 points).}
+          Consider the linear system
+          \[
+             \begin{bmatrix}
+                 1 & 2 & 3\\
+                 2 & 0 & 6\\
+                 3 & 6 & 9
+             \end{bmatrix}
+             \begin{bmatrix}x\\ y\\ z\end{bmatrix}
+             \;=\;
+             \begin{bmatrix} 6 \\ 8 \\ 12 \end{bmatrix}.
+          \]
+          How many solutions does this system have?  Explain your reasoning.
+
+          % YOUR ANSWER HERE
+          \newpage
+
+    \item \textbf{Asymptotic powers of $2\times2$ matrices (6 points).}
+For each matrix below, determine the behavior of 
+\[
+    \lim_{n\to\infty} M^{\,n}
+\]
+
+\textit{Hint: Use the eigen-decomposition $M = P D P^{-1}$, where $D = \{\lambda_1, \lambda_2, ...\}$ is a diagonal matrix of the eigenvalues. What would be the formula for $M^n$?}
+
+\begin{enumerate}[label=(\alph*)]
+    \item
+    $\displaystyle
+       M_1 \;=\;
+       \begin{bmatrix}
+           0 & 1\\
+           1 & 0
+       \end{bmatrix}.
+     $
+    % YOUR ANSWER HERE
+
+    \item
+    $\displaystyle
+       M_2 \;=\;
+       \begin{bmatrix}
+           2 & -5\\
+           1/2 & -7/6
+       \end{bmatrix}.
+     $
+    % YOUR ANSWER HERE
+    
+
+    \item
+    $\displaystyle
+       M_3 \;=\;
+       \begin{bmatrix}
+           4 & -2\\
+           1 & 1
+       \end{bmatrix}.
+     $
+    % YOUR ANSWER HERE
+    
+\end{enumerate}
+\newpage
+
+
+    \item \textbf{Singular Value Decomposition (4 points).} Given the matrix
+    
+    $$A = 
+    \begin{bmatrix}
+      2 & -1 \\
+      2 & 2
+    \end{bmatrix}$$
+        
+    Find a unit vector $x$ ($\|x\|=1$) for which $\|Ax\|$ is maximized.
+    
+    \textit{Hint: Recall from \href{https://en.wikipedia.org/wiki/Singular_value_decomposition}{SVD} that $A = U \Sigma V^\top$, where $A$ maps each right singular vector (a column of $V$) to a left singular vector (a column of $U$), scaled by the corresponding singular value. For which right singular vector does this scaling make $\|Ax\|$ the largest?}
+
+    % YOUR ANSWER HERE
+    
+
+\newpage
+    \item\textbf{Image Flipping (6 points).}
+        \textit{This question is a warmup to problem 4 in the coding section.} 
+        Consider a tiny $3\times 3$ image represented by matrix $I$ and the same image flipped on the Y axis $I_{\text{flip}}$:
+        \[
+        I =
+        \begin{bmatrix}
+        x_1 & x_2 & x_3 \\
+        x_4 & x_5 & x_6 \\
+        x_7 & x_8 & x_9
+        \end{bmatrix},
+        \quad
+        I_{\text{flip}} =
+        \begin{bmatrix}
+        x_7 & x_8 & x_9 \\
+        x_4 & x_5 & x_6 \\
+        x_1 & x_2 & x_3
+        \end{bmatrix}.
+        \]
+        
+        \begin{enumerate}[label=(\alph*)]
+            \item What is the size of the transformation matrix $T$ that performs this flip? 
+            \textit{Hint: You can first convert $I$ to a $1\times 9$ vector, make transformation using matrix $T$, and then convert $I_{\text{flip}}$ back to a $3\times 3$ matrix.}
+
+            % YOUR ANSWER HERE
+            
+            \item Construct $T$ and verify that $I\times T$ produces $I_{\text{flip}}$.
+
+            % YOUR ANSWER HERE
+            
+            \item Describe an algorithm for constructing the vertical-flip transformation matrix for any $N\times N$ matrix (either text explanation or pseudocode is acceptable). Show that $I\times T$ produces $I_{\text{flip}}$.
+
+            % YOUR ANSWER HERE
+            
+            \item Describe how you would modify this algorithm to do a \textit{horizontal} flip (along the X ais).
+
+            % YOUR ANSWER HERE
+            
+        \end{enumerate}
+    
+    
+\end{enumerate}
+\newpage
+
+
+
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\section*{Calculus}
+
+\begin{enumerate}[label=\arabic*., resume]
+
+    \item \textbf{Partial Derivatives (8 points). (First and second derivatives)}
+          \begin{enumerate}[label=(\alph*)]
+              \item For \(f(x_1, x_2) = x_1^3 + x_2^3 - 3x_1x_2\), find all the first and second order partial derivatives.
+
+              % YOUR ANSWER HERE
+              
+              \item Let \( f(x, y) = 4x^2 + y^2 - 8xy + 4x + 6y - 10 \). 
+                
+                Find the critical points by solving 
+                      \[
+                          \frac{\partial f}{\partial x} = 0 \quad \text{and} \quad \frac{\partial f}{\partial y} = 0
+                      \]
+                      simultaneously and determine which point(s) yield a minimum value.
+
+                % YOUR ANSWER HERE
+
+            
+              \item For \( f(x, y) = e^{xy} + x^2y \), compute:
+                    \begin{enumerate}[label=(\roman*)]
+                        \item \(\frac{\partial f}{\partial x}\) and \(\frac{\partial f}{\partial y}\)
+
+                        % YOUR ANSWER HERE
+                        
+                        \item \(\frac{\partial^2 f}{\partial x^2}\), \(\frac{\partial^2 f}{\partial y^2}\), and \(\frac{\partial^2 f}{\partial x \partial y}\)
+
+                        % YOUR ANSWER HERE
+                        
+                    \end{enumerate}
+              \item For \( f(x, y) = \ln(x^2 + y^2 + 1) \), compute:
+                    \begin{enumerate}[label=(\roman*)]
+                        \item \(\frac{\partial f}{\partial x}\) and \(\frac{\partial f}{\partial y}\)
+
+                        % YOUR ANSWER HERE
+                        
+                        \item \(\frac{\partial^2 f}{\partial x^2}\), \(\frac{\partial^2 f}{\partial y^2}\), and \(\frac{\partial^2 f}{\partial x \partial y}\)
+
+                        % YOUR ANSWER HERE
+                        
+                    \end{enumerate}
+          \end{enumerate}
+
+       
+    \newpage
+    
+        
+
+    \item \textbf{Recursive expression and derivatives (6 points).}
+          Suppose we have variables \(z_1, z_2, \dots, z_n\), \(w_1, \dots, w_{n-1}\), and \(b_1, \dots, b_{n-1} \in \mathbb{R}\), where
+          \[
+              z_n = w_{n-1}z_{n-1} + b_{n-1}.
+          \]
+          \begin{enumerate}[label=(\alph*)]
+              \item Compute \(\dfrac{dz_k}{dz_{k-1}}\) for \(k = 2, \dots, n\).
+
+              % YOUR ANSWER HERE
+              
+              \item Compute \(\dfrac{dz_n}{dz_1}\).
+
+              % YOUR ANSWER HERE
+
+              \item Compute \(\dfrac{dz_n}{db_1}\).
+           You may express your answers in terms of $z_1,...,z_n,w_1,...,w_{n-1},b_1,...,b_{n-1}$
+
+           % YOUR ANSWER HERE
+           
+          \end{enumerate}
+
+          
+
+\end{enumerate}
+\newpage
+
+
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\section*{Probability}
+
+\begin{enumerate}[label=\arabic*., resume]
+
+    \item \textbf{Conditioned uniform difference (3 points).}
+          Let $X,Y\stackrel{\text{iid}}{\sim}\text{Unif}(-1,1)$. Compute
+          \[
+             \PP\!\bigl(|X-Y|\le 0.5 \,\bigl|\, X\,Y>0\bigr).
+          \]
+
+            \textit{Hint: Try drawing a 2D cartesian plane where the horizontal and vertical axes represent X and Y respectively and each range from -1 to 1. For which quadrants is it true that $XY > 0$? Within these quadrants, how can we visualize the region $|X-Y| < 0.5$?}
+
+            % YOUR ANSWER HERE
+
+        
+    \newpage
+
+    \item \textbf{Nearest–neighbor arc length (4 points).}
+        Suppose you select $20$ i.i.d.\ points $X_1,\dots,X_{20}$ uniformly at random on the
+        circumference of the unit circle. 
+
+        \begin{enumerate}
+            \item Let D be the shortest arc distance from $X_1$ to the nearest of the other 19 points. Calculate $\mathbb{P}(D > t)$ where $0 \leq t \leq \frac{1}{2}$.
+
+            \textit{Hint: What does the event $\{D > t\}$ mean in terms of where the other 19 points can be located relative to $X_1$?}
+
+            % YOUR ANSWER HERE
+            
+
+            \item Find the expected arc length (in degrees)
+            between $X_1$ and the point nearest to it. 
+            
+            \textit{Hint: The} \href{https://en.wikipedia.org/wiki/Expected_value#Random_variables_with_density}{Wikipedia page on expected value of continuous variables} \textit{may be helpful here.}
+
+            % YOUR ANSWER HERE
+
+
+        \end{enumerate}
+    \newpage
+
+
+    \item \textbf{Cancer screening (3 points).}
+          A medical test has sensitivity $90\%$ and false–positive rate $3\%$:
+          \[
+          \PP(T=1\mid C=1)=0.9,\qquad \PP(T=1\mid C=0)=0.03.
+          \]
+          Suppose the disease prevalence is very low, $\PP(C=1)=0.001$. Compute the posterior probability of disease given a positive test:
+          \[
+          \PP(C=1\mid T=1).
+          \]
+
+          % YOUR ANSWER HERE
+
+    \newpage
+
+    \item \textbf{Follower Counts (3 points).}
+        Suppose $420$ people are sitting uniformly at random around a circle, each with a
+        \emph{distinct} number of TikTok followers. What is the expected number of
+        people whose follower count is higher than both their immediate neighbors?
+
+        % YOUR ANSWER HERE
+
+\end{enumerate}
+
+\end{document}
+

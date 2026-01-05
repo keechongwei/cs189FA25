@@ -1,0 +1,14 @@
+git+https://github.com/BerkeleyML/otter-grader-189.git@master#egg=otter_grader
+datasets
+matplotlib
+numpy
+pandas
+Pillow
+plotly
+pygame
+scikit-learn
+tqdm
+torch
+torchaudio
+torchvision
+transformers

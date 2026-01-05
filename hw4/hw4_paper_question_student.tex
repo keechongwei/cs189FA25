@@ -1,0 +1,311 @@
+\documentclass[11pt]{article}
+
+% ---------- Packages ----------
+\usepackage{hyperref}
+\usepackage{amsmath,amssymb,amsfonts,amsthm}
+\usepackage{enumitem}
+\usepackage{geometry}
+\usepackage{fancyhdr}
+\usepackage{xcolor}
+\usepackage{environ}
+\usepackage{tikz}
+\usepackage{comment}
+
+% ---------- Page Geometry ----------
+\geometry{margin=1in}
+
+% ---------- Solution Space ----------
+\NewEnviron{solution}{%
+    {\par\smallskip\textcolor{blue}{\textbf{Solution. }\BODY}\par\smallskip}
+}
+
+% ---------- Running Header / Footer ----------
+\pagestyle{fancy}
+\fancyhf{}
+\lhead{\textbf{CS 189/289A}}
+\rhead{Fall 2025}
+\cfoot{\thepage}
+
+% ---------- Helpful Macros ----------
+\newcommand{\RR}{\mathbb{R}}
+\newcommand{\EE}{\mathbb{E}}
+\newcommand{\PP}{\mathbb{P}}
+\renewcommand{\vec}[1]{\mathbf{#1}}
+
+% ---------- Global Question Counter and Proper Indentation ----------
+\newcounter{qcounter}
+\newlength{\qlabelwidth}
+\setlength{\qlabelwidth}{3em} % width reserved for "Qxx." (adjust if needed)
+
+\newcommand{\question}{%
+  \refstepcounter{qcounter}%
+  \par\noindent
+  \makebox[\qlabelwidth][l]{\textbf{Q\arabic{qcounter}.}}%
+  \hangindent=\qlabelwidth\hangafter=1%
+}
+% ============================================================
+\begin{document}
+
+% ---------- Homework Header ----------
+\begin{center}
+    {\huge\bfseries Homework 4 Paper Questions: ResNets and Transformers}\\[6pt]
+    \textbf{Due: Friday, November 21st at 11:59 pm}\\
+\end{center}
+
+\vspace{0.5em}\hrule\vspace{1em}
+
+% ---------- Deliverables ----------
+\noindent\textbf{Deliverables.} Submit a PDF of your write-up to Gradescope \emph{HW4 Paper Questions}
+
+\noindent \textit{Note}: we \textbf{highly discourage} very long answers, most or all of your free response answers should be 1-3 sentences.
+\vspace{0.3em}
+% ============================================================
+\section*{Overview}
+Machine learning architectures have evolved over time. Starting from the humble multi-layer perceptron (MLPs) to highly complex neural networks with hundreds of layers! In this homework, we'll explore 2 monumental architectural innovations: \textbf{ResNets} and \textbf{Transformers}.
+
+You are encouraged to skim related works, but focus on the problems, current solutions, contributions, methods, and limitations.  
+
+This assignment is not about memorizing details, but about developing the ability to \emph{read research papers methodically}.  
+Most research papers follow a common structure: they first motivate a \textbf{problem}, then describe \textbf{current solutions} and their limitations, followed by the \textbf{proposed solution and key insights}, the \textbf{methods} used, and finally a discussion of \textbf{limitations}.  
+
+This homework is designed to help you practice and internalize this process of critical reading as you answer the questions. We have also provided pointers to relevant section that you might want to pay more attention to for each question.
+
+\begin{itemize}
+  \item ResNets: \href{https://arxiv.org/abs/1512.03385}{Deep Residual Learning for Image Recognition (arXiv:1512.03385)}
+  \item Transformers: \href{https://arxiv.org/abs/1706.03762}
+  {Attention Is All You Need (arXiv:1706.03762)}
+\end{itemize}
+
+Some helpful resources compiled by course staff for understanding the Attention Is All You Need Paper:
+\begin{itemize}
+    \item \href{https://www.youtube.com/watch?v=wjZofJX0v4M&list=PLZHQObOWTQDNU6R1_67000Dx_ZCJB-3pi&index=6}{YouTube: Transformers, the tech behind LLMs | Deep Learning Chapter 5 - 3Blue1Brown}
+    \item \href{https://www.youtube.com/watch?v=eMlx5fFNoYc&list=PLZHQObOWTQDNU6R1_67000Dx_ZCJB-3pi&index=7}{YouTube: Attention in transformers, step-by-step | Deep Learning Chapter 6 - 3Blue1Brown}
+    \item \href{https://www.youtube.com/watch?v=9-Jl0dxWQs8&list=PLZHQObOWTQDNU6R1_67000Dx_ZCJB-3pi&index=8}{YouTube: How might LLMs store facts | Deep Learning Chapter 7 - 3Blue1Brown}
+    \item \href{https://www.youtube.com/watch?v=zxQyTK8quyY}{YouTube: Transformer Neural Networks, ChatGPT's foundation, Clearly Explained!!! - StatQuest}
+    \item \href{https://youtu.be/7xTGNNLPyMI?si=k6LlAFEUhEI-FXQZ}{YouTube: Deep Dive into LLMs like ChatGPT}
+    \item \href{https://d2l.ai/chapter_attention-mechanisms-and-transformers/transformer.html}{The Transformer Architecture - Dive Into Deep Learning}
+\end{itemize}
+% ============================================================
+% \section*{Paper Questions}
+\newpage
+
+\section{ResNets}
+
+\begin{figure}[h]
+    \centering
+    \includegraphics[width=0.45\textwidth]{resnet_figure2.png}
+    \parbox{0.6\textwidth} {
+    \begin{center}
+        Figure 2 from the Deep Residual Learning for Image Recognition: "Residual learning: a building block."
+        \end{center}
+    }
+    \label{fig:resnet_figure2}
+\end{figure}
+
+\subsection*{Problem}
+  
+  \question (\texttt{1 Pt.}) In less than 5 words, describe the kind of tasks was ResNet designed for. \textit{[Sections: 1 - Introduction]} 
+  
+  \begin{solution}
+  Your solution here...
+  \end{solution}
+
+  \question (\texttt{1 Pt.}) What problem did the authors of the ResNet paper aim to solve? \textit{[Sections: Abstract, 1 - Introduction]} 
+
+  Hint: What kind of problems did researchers/engineers notice happening with deeper neural networks? What differentiates \textbf{degradation} from \textbf{overfitting}?
+  
+  \begin{solution}
+  Your solution here...
+  \end{solution}
+  
+\subsection*{Current works}
+
+  \question (\texttt{2 Pts.})  How might you construct a deeper counterpart of a neural network that produces the exact same outputs as a shallower network? Why doesn't this work in practice, i.e. why does \textbf{degradation} occur in deeper neural networks? \textit{[Sections: 1 - Introduction, 2 - Related Work]}
+
+  \begin{solution}
+  Your solution here...
+  \end{solution}
+
+\subsection*{Proposed Solution}
+
+  \question (\texttt{1 Pt.})  The ResNet authors proposed building layers that can learn the residual function $F(x) + x$ instead of directly learning $H(x)$. Why might we want to learn the function $F(x) + x$ if it is equivalent to $H(x)$? How does learning $F(x)$ help solve the degradation problem? \textit{[Section: 3.1 - Residual Learning]}
+  
+  \begin{solution}
+  Your solution here...
+  \end{solution}
+  
+\subsection*{Method Details}
+
+
+    \question (\texttt{2 Pts.}) What are two workarounds if your original input $x$ and the output of your sublayer $F(x)$ don't have equal dimensions? \textit{[Section: 3.3 - Network Architectures - Residual Network]}
+    
+  \begin{solution}
+  Your solution here...
+  \end{solution}
+  
+    \question (\texttt{2 Pts.}) Explain the 3 options for how residual/shortcut connections might be implemented. and compare their parameter counts (relative comparisons---which has more vs. less---are okay). Based on the parameter count comparisons, briefly discuss how the 3 different residual connection implementations might affect the model's memory requirements or training time. \textit{[Section: 4 - Experiments - Identity vs. Projection Shortcuts]}
+  \begin{solution}
+  Your solution here...
+  \end{solution}
+
+\subsection*{Key Insight \& Contributions}
+  \question (\texttt{1 Pt.})  What benefits did the authors notice with residual networks? What empirical proof did the authors provide to show that ResNet architectures didn't suffer from the degradation problem? \textit{[Sections: Abstract, 4 - Experiments, Figure 4, Table 2]}
+  
+  \begin{solution}
+  Your solution here...
+  \end{solution}
+
+% ------------------------------------------------------------
+\newpage
+
+\section{Transformers - Attention Is All You Need}
+
+A helpful preface:
+\begin{enumerate}
+    \item Transduction (AKA seq2seq) refers to the task of mapping input sequences to output sequences. For example, machine translation refers to a model translating a \emph{source sequence} in one language into a \emph{target sequence} in another language.
+    \item During generation, the decoder predicts the token at position $i$. The input embedding the decoder receives comes from the first $i-1$ output tokens. This is called \textbf{teacher forcing }during training (feeding in ground-truth tokens shifted by one) and \textbf{auto-regressive generation} at inference. Offsetting by one during training ensures the model's prediction for position $i$ depends on previous outputs, never on itself or future targets.
+
+\end{enumerate}
+
+\begin{figure}[h]
+    \centering
+    \includegraphics[width=0.45\textwidth]{transformer_architecture.png}
+    \parbox{0.6\textwidth} {
+    \begin{center}
+        Figure 1 from Attention Is All You Need: "The Transformer - model architecture."
+    \end{center}
+    }
+    \label{fig:resnet_figure2}
+\end{figure}
+
+\subsection*{Problem}
+
+  \question (\texttt{1 Pt.})  In a short sentence, What task is the paper "Attention Is All You Need" trying to solve? \textit{[Section: 1- Introduction]}
+  
+  \begin{solution}
+  Your solution here...
+  \end{solution}
+
+  \question (\texttt{1 Pt.})  What are the jobs of the encoder and decoder? \textit{[Section: 3 - Model Architecture]}  
+
+  \begin{solution}
+  Your solution here...
+  \end{solution}
+  
+\subsection*{Metrics}
+  \question (\texttt{2 Pts.})  Two important metrics that the authors highlight in the paper are BLEU scores and perplexity. Describe what BLEU score and perplexity measure, and what their limitations are. Feel free to use some outside research! \textit{[Sections: Abstract, Table 3]}
+
+  \begin{solution}
+  Your solution here...
+  \end{solution}
+
+\subsection*{Current Works}
+
+  \question (\texttt{1 Pt.}) What are some challenges that existing architectures face? Describe the shortcomings of both recurrent neural networks (RNNs) and sequential convolutional neural networks. \textit{[Sections: 1 - Introduction, 2 - Background]}  
+
+  \begin{solution}
+  Your solution here...
+  \end{solution}
+  
+\begin{figure}[h]
+    \centering
+    \includegraphics[width=0.7\textwidth]{attention.png}
+    \parbox{1.0\textwidth} {
+    \begin{center}
+        Figure 2 from Attention Is All You Need: "(left) Scaled Dot-Product Attention. (right) Multi-Head Attention consists of several
+attention layers running in parallel."
+    \end{center}
+    }
+    \label{fig:resnet_figure2}
+\end{figure}
+
+
+\subsection*{Proposed solution}
+  \question (\texttt{1 Pt.})  In a short sentence, describe what "attention" is in your own words. This doesn't have to be within the context of machine learning, but feel free to start also thinking about how the idea of attention might transfer over to what the transformer architecture tries to do. \textit{[Section: your mind]}  
+  
+  \begin{solution}
+  Your solution here...
+  \end{solution}
+
+  
+  \begin{solution}
+  Your solution here...
+  \end{solution}
+  
+\subsection{Method Details}
+
+  \question (\texttt{1 Pt.})  What is the purpose of masking during decoder self-attention? \textit{[Sections: 3.1 - Encoder and Decoder Stacks, 3.2.3 - Applications of Attention in our Model]}
+
+  \begin{solution}
+  Your solution here...
+  \end{solution}
+  
+  \question (\texttt{2 Pts.})  Why does the Transformer paper scale $Q K^T$ by $\frac{1}{\sqrt d_k}$?
+  \textit{[Section: 3.2.1 - Scaled Dot-Product Attention]}
+  
+  Hint: Imagine we sum up I.I.D. random variables where $x_i \sim \mathcal{N}(0, 1)$. What is the variance of this sum?
+  
+  \begin{solution}
+  Your solution here...
+  \end{solution}
+
+  \question (\texttt{1 Pt.}) What are 2 benefits of multi-headed attention? \textit{[Section: 3.2.2 - Multi-Head Attention]}
+  
+  \begin{solution}
+  Your solution here...
+  \end{solution}
+
+  \question (\texttt{2 Pts.})  Where do the query, key, and value vectors come from in the following parts of a transformer, and why? \textit{[Section: 3.2.3 - Applications of Attention in our Model]}
+  
+  \begin{enumerate}[label=(\alph*)]
+    \item Encoder self-attention
+    \item Decoder self-attention
+    \item Decoder cross-attention (the paper refers to this as "encoder-decoder attention")
+\end{enumerate}
+
+  \begin{solution}
+  Your solution here...
+  \end{solution}
+  
+  \question (\texttt{2 Pts.})  Explain the differences between what the transformer decoder receives as input and what it outputs during training vs. inference. \textit{[Sections: 3 - Model Architecture, 5.1 - Training Data and Batching]}
+
+  \begin{solution}
+  Your solution here...
+  \end{solution}
+
+  \question (\texttt{2 Pts.})  Why does the standard input to a transformer model (before adding positional encodings) not contain any information about the order of tokens in a sequence? How do positional encodings help the model understand token order? \textit{[Section: 3.5 - Positional Encoding]}
+
+  \begin{solution}
+  Your solution here...
+  \end{solution}
+  
+\subsection*{Key Insight / contributions}
+
+  \question (\texttt{2 Pts.})  What advantages does the self-attention mechanism have over recurrent layers and convolutional layers in the context of sequence modeling? \textit{[Section: 4 - Why Self-Attention]}
+  \begin{solution}
+  Your solution here...
+  \end{solution}
+
+\subsection*{Future Work}
+
+  \question (\texttt{2 Pts.})  As mentioned earlier in the assignment, the transformer architecture has rocked the machine learning world in countless ways! One application has been in computer vision, where Vision Transformers have matched and even beat state-of-the-art convolutional neural networks in image-processing tasks. How might you adapt transformers to process images? Think about how you might create "tokens" from images. If you don't know where to start, feel free to skim follow-up works to this paper which look into this. 
+  
+  \begin{solution}
+  Your solution here...
+  \end{solution}
+  
+  \question (\texttt{2 Pts.})  Suppose you have a ResNet and a Vision Transformer, both trained on ImageNet with standard preprocessing (e.g. image resizing, pixel standardization). Now, you are given a new image of size $1024 \times 512$. How would you process this image for each model? What are the key differences in how ResNets and Vision Transformers handle input image sizes?
+
+  \begin{solution}
+  Your solution here...
+  \end{solution}
+  
+% ============================================================
+% \section*{Other Practical Resources}
+
+% \subsection*{Placeholder}
+% \begin{itemize}
+%     \item 
+% \end{itemize}
+
+\end{document}
