@@ -1,6 +1,6 @@
-# Machine Learning Coursework Portfolio
+# COMPSCI 189: Introduction To Machine Learning Coursework 
 
-This repository contains a collection coursework completed as part of COMPSCI 189, an upper division Machine Learning Course at UC Berkeley.
+This repository contains a collection of coursework completed as part of COMPSCI 189, an upper division Machine Learning Course at UC Berkeley.
 
 Across five assignments, I implemented, trained, analyzed, and debugged models spanning **representation learning, clustering, generative modeling, control, and large language model fine-tuning**.
 
