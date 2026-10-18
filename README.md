@@ -24,11 +24,11 @@ Across these assignments, I worked directly with:
 ---
 
 ## 🗂 Repository Structure
-hw1/ **Representation learning & clustering**
-hw2/ **Control & style conditioning**
-hw3/ **Modern ML pipelines & evaluation**
-hw4/ **Generative Modeling**
-hw5/ **Large Language Model fine-tuning**
+hw1/ **Representation learning & clustering** <br>
+hw2/ **Control & style conditioning** <br>
+hw3/ **Modern ML pipelines & evaluation** <br>
+hw4/ **Generative Modeling** <br>
+hw5/ **Large Language Model fine-tuning** <br>
 
 Each folder contains self-contained Jupyter notebooks with experiments, visualizations, and analysis.
 
